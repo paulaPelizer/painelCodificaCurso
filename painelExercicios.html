@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Painel de Mini Programas</title>
+  <style>
+    body {
+      background: #1e2330;
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #20232a;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .container-main {
+      display: flex;
+      height: 100vh;
+      align-items: stretch;
+    }
+    .sidebar {
+      width: 210px;
+      background: linear-gradient(180deg, #80f3decc 0%, #e5fffd66 100%);
+      border-right: 2px solid #7ee9c1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 28px 0 0 0;
+      min-height: 100vh;
+      z-index: 10;
+      position: relative;
+      box-shadow: 2px 0 18px #1ae9c020;
+      backdrop-filter: blur(2px);
+    }
+    .sidebar-title {
+      font-size: 1.13rem;
+      color: #f5faf9;
+      font-weight: 700;
+      margin: 0 0 18px 36px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 4px #0a0229;
+    }
+    .menu-btn {
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 14px 36px;
+      font-size: 1.05rem;
+      color: #136c63;
+      cursor: pointer;
+      outline: none;
+      border-left: 4px solid transparent;
+      transition: background 0.14s, color 0.13s, border-color 0.17s;
+      font-weight: 500;
+      border-radius: 0 30px 30px 0;
+      background: none;
+    }
+    .menu-btn.active, .menu-btn:hover {
+      background: #ccfbf6dd;
+      color: #11d1b5;
+      border-left: 4px solid #80f3de;
+    }
+    .main-panel {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      position: relative;
+      min-width: 320px;
+    }
+    .program-panel {
+      margin-left: 64px;
+      background: #f5f8fb;
+      border-radius: 18px;
+      box-shadow: 0 0 22px #b3bacd30, 0 0 0px 1.5px #e2e9f150;
+      min-width: 260px;
+      max-width: 290px;
+      min-height: 340px;
+      padding: 34px 20px 18px 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      border: 1.5px solid #dee6f0;
+      position: relative;
+      z-index: 2;
+      transition: box-shadow 0.22s;
+    }
+    .program-title {
+      font-size: 1.17rem;
+      font-weight: 700;
+      color: #17e4c2;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+      text-shadow: none;
+    }
+    .code-btn {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: linear-gradient(90deg, #d7fff7 30%, #c1f7e9 100%);
+      color: #19c4a3;
+      border: 1.2px solid #b6ffe4;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-radius: 7px;
+      padding: 4px 15px 4px 14px;
+      box-shadow: 0 0 7px #4bf6b922;
+      cursor: pointer;
+      outline: none;
+      transition: background 0.17s, color 0.17s;
+      z-index: 100;
+    }
+    .code-btn.active, .code-btn:hover {
+      background: linear-gradient(90deg, #19c4a3 0%, #7ee9c1 100%);
+      color: #fff;
+      border-color: #81efd6;
+    }
+    .program-form label {
+      font-size: 0.96rem;
+      margin-bottom: 6px;
+      color: #347f8e;
+      display: block;
+      font-weight: 500;
+    }
+    .program-form input {
+      width: 92%;
+      padding: 8px 8px;
+      border-radius: 8px;
+      border: 1.2px solid #b5c7d2;
+      background: #f5fafd;
+      color: #243241;
+      font-size: 1.03rem;
+      margin-bottom: 12px;
+      outline: none;
+      font-weight: 400;
+      transition: border-color 0.15s;
+    }
+    .program-form input:focus {
+      border-color: #17e4c2;
+    }
+    .program-form button {
+      padding: 7px 20px;
+      border-radius: 7px;
+      border: none;
+      background: linear-gradient(90deg, #84e6d6, #b49fff, #98d3fc);
+      color: #1a2440;
+      font-weight: 600;
+      font-size: 1.01rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px #7e9fff20;
+      transition: background 0.13s, transform 0.13s;
+    }
+    .program-form button:hover {
+      background: linear-gradient(90deg, #b49fff, #84e6d6, #98d3fc);
+      transform: scale(1.04);
+    }
+    .program-output {
+      margin-top: 11px;
+      color: #3b526a;
+      font-size: 1.03rem;
+      min-height: 23px;
+      font-weight: 500;
+      word-break: break-word;
+    }
+    .code-box {
+      display: none;
+      position: fixed;
+      left: auto;
+      right: 3vw;
+      top: 50px;
+      min-width: 240px;
+      max-width: 480px;
+      background: #15191f;
+      color: #fff;
+      font-size: 0.95em;
+      border-radius: 12px;
+      padding: 18px 24px 18px 24px;
+      box-shadow: 0 0 60px #41e6c455, 0 0 0px 1.5px #b49fff30;
+      border: 1.2px solid #41e6c466;
+      white-space: pre-line;
+      z-index: 9999;
+      font-family: 'Fira Mono', 'Consolas', monospace;
+      font-weight: 400;
+      line-height: 1.17;
+      opacity: 0.99;
+      overflow-x: auto;
+      animation: codefade 0.4s;
+      transition: box-shadow 0.16s, opacity 0.18s;
+      word-break: break-word;
+    }
+    .code-box.active {
+      display: block;
+    }
+    @keyframes codefade {
+      from { opacity: 0; transform: translateY(10px);}
+      to { opacity: 0.99; transform: translateY(0);}
+    }
+    @media (max-width: 900px) {
+      .code-box {
+        left: 2vw;
+        right: 2vw;
+        top: auto;
+        bottom: 15px;
+        max-width: 95vw;
+        min-width: 60vw;
+        padding: 10px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container-main">
+  <!-- Sidebar Menu -->
+  <nav class="sidebar">
+    <div class="sidebar-title">Mini Programas</div>
+    <button class="menu-btn active" onclick="showPanel(0)">Tabuada</button>
+    <button class="menu-btn" onclick="showPanel(1)">Faixa Etária</button>
+    <button class="menu-btn" onclick="showPanel(2)">Ano Bissexto</button>
+    <button class="menu-btn" onclick="showPanel(3)">Positivo, Negativo ou Zero</button>
+    <button class="menu-btn" onclick="showPanel(4)">Média Aritmética</button>
+  </nav>
+  <!-- Main Content Panel -->
+  <div class="main-panel" style="flex-direction: row; position:relative;">
+    <!-- Painel dos programas -->
+    <div id="prog-tabuada" class="program-panel">
+      <button class="code-btn" type="button" onclick="toggleCode(0);event.stopPropagation()" id="code-btn-0">Ver código</button>
+      <div class="program-title">Tabuada</div>
+      <form class="program-form" onsubmit="tabuada(event)">
+        <label for="tabuada-num">Informe um número:</label>
+        <input type="number" id="tabuada-num" placeholder="Ex: 7" required>
+        <button type="submit">Mostrar Tabuada</button>
+      </form>
+      <div class="program-output" id="tabuada-output"></div>
+    </div>
+    <div id="prog-faixa" class="program-panel" style="display:none;">
+      <button class="code-btn" type="button" onclick="toggleCode(1);event.stopPropagation()" id="code-btn-1">Ver código</button>
+      <div class="program-title">Faixa Etária</div>
+      <form class="program-form" onsubmit="faixaEtaria(event)">
+        <label for="faixa-idade">Informe a idade:</label>
+        <input type="number" id="faixa-idade" placeholder="Ex: 15" min="0" required>
+        <button type="submit">Verificar Faixa</button>
+      </form>
+      <div class="program-output" id="faixa-output"></div>
+    </div>
+    <div id="prog-bissexto" class="program-panel" style="display:none;">
+      <button class="code-btn" type="button" onclick="toggleCode(2);event.stopPropagation()" id="code-btn-2">Ver código</button>
+      <div class="program-title">Ano Bissexto</div>
+      <form class="program-form" onsubmit="bissexto(event)">
+        <label for="bissexto-ano">Digite um ano:</label>
+        <input type="number" id="bissexto-ano" placeholder="Ex: 2024" required>
+        <button type="submit">Verificar</button>
+      </form>
+      <div class="program-output" id="bissexto-output"></div>
+    </div>
+    <div id="prog-positivo" class="program-panel" style="display:none;">
+      <button class="code-btn" type="button" onclick="toggleCode(3);event.stopPropagation()" id="code-btn-3">Ver código</button>
+      <div class="program-title">Número: Positivo, Negativo ou Zero</div>
+      <form class="program-form" onsubmit="positivoNegativo(event)">
+        <label for="positivo-num">Digite um número:</label>
+        <input type="number" id="positivo-num" placeholder="Ex: -2" required>
+        <button type="submit">Verificar</button>
+      </form>
+      <div class="program-output" id="positivo-output"></div>
+    </div>
+    <div id="prog-media" class="program-panel" style="display:none;">
+        <button class="code-btn" type="button" onclick="toggleCode(4);event.stopPropagation()" id="code-btn-4">Ver código</button>
+        <div class="program-title">Média Aritmética</div>
+        <form class="program-form" id="form-media" onsubmit="adicionarNumero(event)">
+          <label for="media-num">Digite um número (0 encerra):</label>
+          <input type="number" id="media-num" placeholder="Ex: 10" required>
+          <button type="submit">Adicionar</button>
+        </form>
+        <div class="media-list" id="media-list" style="color:#19756c; font-size:0.98rem; min-height:24px; margin-bottom:10px;"></div>
+        <button class="program-form" style="margin-top: 7px;" onclick="calcularMedia()" id="btn-calc-media" type="button">Calcular Média</button>
+        <div class="program-output" id="media-output"></div>
+      </div>
+    <!-- Código fonte fixo e sempre na frente -->
+    <div id="code-tabuada" class="code-box">
+// Tabuada
+const numero = parseInt(prompt('Digite o número para ver a tabuada: '));
+if (isNaN(numero)) {
+  console.log('Valor inválido. Por favor, digite um número.');
+} else {
+  let i = 1;
+  while (i <= 10) {
+    console.log(`${numero} x ${i} = ${numero * i}`);
+    i++;
+  }
+}
+    </div>
+    <div id="code-faixa" class="code-box">
+// Faixa Etária
+const idade = parseInt(prompt('Informe a idade: '));
+let faixaEtaria;
+if (isNaN(idade) || idade < 0) {
+  faixaEtaria = 'Idade inválida';
+} else {
+  switch (true) {
+    case (idade >= 0 && idade <= 12):
+      faixaEtaria = 'Criança';
+      break;
+    case (idade >= 13 && idade <= 17):
+      faixaEtaria = 'Adolescente';
+      break;
+    case (idade >= 18):
+      faixaEtaria = 'Adulto';
+      break;
+    default:
+      faixaEtaria = 'Idade não reconhecida';
+  }
+}
+console.log('Faixa etária: ' + faixaEtaria);
+    </div>
+    <div id="code-bissexto" class="code-box">
+// Ano Bissexto
+const ano = parseInt(prompt('Digite um ano: '));
+if (isNaN(ano)) {
+  console.log('Valor inválido. Por favor, digite um ano.');
+} else if ((ano % 4 === 0 && ano % 100 !== 0) || (ano % 400 === 0)) {
+  console.log(ano + ' é um ano bissexto.');
+} else {
+  console.log(ano + ' não é um ano bissexto.');
+}
+    </div>
+    <div id="code-positivo" class="code-box">
+// Positivo, Negativo ou Zero
+const num1 = parseFloat(prompt('Digite um número: '));
+if (isNaN(num1)) {
+  console.log('Valor inválido. Por favor, digite um número.');
+} else if (num1 > 0) {
+  console.log('Número positivo');
+} else if (num1 < 0) {
+  console.log('Número negativo');
+} else {
+  console.log('Zero');
+}
+    </div>
+    <div id="code-media" class="code-box">
+//Calcule a média aritmética de números inseridos até que o usuário digite 0
+let resposta;
+let soma = 0;
+let contador = 0;
+do {
+    resposta = Number(prompt('Informe um número (Para calcular a média final, digite 0): '));
+    if (resposta !== 0) {
+        soma += resposta;
+        contador++;
+    }
+} while (resposta !== 0);
+if (contador > 0) {
+    let mediaFinal = soma / contador;
+    console.log(`A média final é: ${mediaFinal}`);
+} else {
+    console.log('Nenhum número válido foi inserido.');
+}
+    </div>
+  </div>
+</div>
+<script>
+    let openCodeIdx = null;
+
+    function showPanel(idx) {
+      const panels = [
+        document.getElementById('prog-tabuada'),
+        document.getElementById('prog-faixa'),
+        document.getElementById('prog-bissexto'),
+        document.getElementById('prog-positivo'),
+        document.getElementById('prog-media')
+      ];
+      const codes = [
+        document.getElementById('code-tabuada'),
+        document.getElementById('code-faixa'),
+        document.getElementById('code-bissexto'),
+        document.getElementById('code-positivo'),
+        document.getElementById('code-media')
+      ];
+      const btns = [
+        document.getElementById('code-btn-0'),
+        document.getElementById('code-btn-1'),
+        document.getElementById('code-btn-2'),
+        document.getElementById('code-btn-3'),
+        document.getElementById('code-btn-4')
+      ];
+      document.querySelectorAll('.menu-btn').forEach((btn, i) => {
+        if(i === idx) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      panels.forEach((el, i) => el.style.display = i === idx ? '' : 'none');
+      codes.forEach((el, i) => el.classList.remove('active'));
+      btns.forEach((btn, i) => btn.classList.remove('active'));
+      openCodeIdx = null;
+
+      // Reset painel da média
+      if(idx === 4) {
+        listaNumeros = [];
+        fimInsercao = false;
+        document.getElementById('media-list').textContent = '';
+        document.getElementById('media-num').value = '';
+        document.getElementById('media-num').disabled = false;
+        document.getElementById('form-media').querySelector('button[type="submit"]').disabled = false;
+        document.getElementById('media-output').textContent = '';
+      }
+    }
+    function toggleCode(idx) {
+      const codes = [
+        document.getElementById('code-tabuada'),
+        document.getElementById('code-faixa'),
+        document.getElementById('code-bissexto'),
+        document.getElementById('code-positivo'),
+        document.getElementById('code-media')
+      ];
+      const btns = [
+        document.getElementById('code-btn-0'),
+        document.getElementById('code-btn-1'),
+        document.getElementById('code-btn-2'),
+        document.getElementById('code-btn-3'),
+        document.getElementById('code-btn-4')
+      ];
+      codes.forEach((el, i) => el.classList.remove('active'));
+      btns.forEach((btn, i) => btn.classList.remove('active'));
+      if (openCodeIdx === idx) {
+        openCodeIdx = null;
+        return;
+      }
+      codes[idx].classList.add('active');
+      btns[idx].classList.add('active');
+      openCodeIdx = idx;
+    }
+    showPanel(0);
+
+    // ---------- Média Aritmética (browser) ----------
+    let listaNumeros = [];
+    let fimInsercao = false;
+
+    function adicionarNumero(event) {
+      event.preventDefault();
+      const input = document.getElementById('media-num');
+      const valor = Number(input.value);
+
+      if (fimInsercao) return;
+
+      if (valor === 0) {
+        fimInsercao = true;
+        input.value = '';
+        input.disabled = true;
+        document.getElementById('form-media').querySelector('button[type="submit"]').disabled = true;
+        atualizarLista();
+        return;
+      }
+
+      listaNumeros.push(valor);
+      atualizarLista();
+      input.value = '';
+      input.focus();
+    }
+
+    function atualizarLista() {
+      const mediaList = document.getElementById('media-list');
+      if (fimInsercao) {
+        mediaList.textContent = "Números inseridos: " + (listaNumeros.length ? listaNumeros.join(', ') : 'Nenhum') + " [Fim]";
+      } else {
+        mediaList.textContent = "Números inseridos: " + (listaNumeros.length ? listaNumeros.join(', ') : '');
+      }
+    }
+
+    function calcularMedia() {
+      const output = document.getElementById('media-output');
+      if (listaNumeros.length > 0) {
+        let soma = listaNumeros.reduce((acc, n) => acc + n, 0);
+        let media = soma / listaNumeros.length;
+        output.textContent = "A média é: " + media.toFixed(2);
+      } else {
+        output.textContent = "Nenhum número válido foi inserido.";
+      }
+    }
+
+    function tabuada(event) {
+      event.preventDefault();
+      const num = parseInt(document.getElementById('tabuada-num').value);
+      const output = document.getElementById('tabuada-output');
+      if (isNaN(num)) {
+        output.textContent = 'Valor inválido. Por favor, digite um número.';
+        return;
+      }
+      let res = '';
+      let i = 1;
+      while (i <= 10) {
+        res += `${num} × ${i} = ${num * i}<br>`;
+        i++;
+      }
+      output.innerHTML = res;
+    }
+    function faixaEtaria(event) {
+      event.preventDefault();
+      const idade = parseInt(document.getElementById('faixa-idade').value);
+      const output = document.getElementById('faixa-output');
+      let faixa;
+      if (isNaN(idade) || idade < 0) {
+        faixa = 'Idade inválida';
+      } else {
+        switch (true) {
+          case (idade >= 0 && idade <= 12):
+            faixa = 'Criança';
+            break;
+          case (idade >= 13 && idade <= 17):
+            faixa = 'Adolescente';
+            break;
+          case (idade >= 18):
+            faixa = 'Adulto';
+            break;
+          default:
+            faixa = 'Idade não reconhecida';
+        }
+      }
+      output.textContent = 'Faixa etária: ' + faixa;
+    }
+    function bissexto(event) {
+      event.preventDefault();
+      const ano = parseInt(document.getElementById('bissexto-ano').value);
+      const output = document.getElementById('bissexto-output');
+      if (isNaN(ano)) {
+        output.textContent = 'Valor inválido. Por favor, digite um ano.';
+      } else if ((ano % 4 === 0 && ano % 100 !== 0) || (ano % 400 === 0)) {
+        output.textContent = ano + ' é um ano bissexto.';
+      } else {
+        output.textContent = ano + ' não é um ano bissexto.';
+      }
+    }
+    function positivoNegativo(event) {
+      event.preventDefault();
+      const num = parseFloat(document.getElementById('positivo-num').value);
+      const output = document.getElementById('positivo-output');
+      if (isNaN(num)) {
+        output.textContent = 'Valor inválido. Por favor, digite um número.';
+      } else if (num > 0) {
+        output.textContent = 'Número positivo';
+      } else if (num < 0) {
+        output.textContent = 'Número negativo';
+      } else {
+        output.textContent = 'Zero';
+      }
+    }
+</script>
+</body>
+</html>
